@@ -1,11 +1,15 @@
-1.
-    b)
- A partir del gráfico, identificamos la periodicidad espacial de la onda y aplicamos la relación fundamental de la propagación electromagnética.
-Longitud de onda $\lambda = 60 \text{ mm}.$
+1. **b)** A partir del gráfico, identificamos la periodicidad espacial de la onda y aplicamos la relación fundamental de la propagación electromagnética.
 
-Frecuencia ($f$)
-Fórmula: $c = \lambda \cdot f \implies f = \frac{c}{\lambda}$
-Datos:Velocidad de la luz: $c = 3 \times 10^8 \text{ m/s}$Longitud de onda: $\lambda = 0{,}06 \text{ m}$$$f = \frac{3 \times 10^8 \text{ m/s}}{0{,}06 \text{ m}} = 5 \text{ GHz}$$
+* **Longitud de onda:** $\lambda = 60\text{ mm} = 0{,}06\text{ m}$
+* **Frecuencia ($f$):**
+  * **Fórmula:** $c = \lambda \cdot f \implies f = \frac{c}{\lambda}$
+  * **Datos:**
+    * Velocidad de la luz: $c = 3 \times 10^8\text{ m/s}$
+    * Longitud de onda: $\lambda = 0{,}06\text{ m}$
+
+$$
+f = \frac{3 \times 10^8\text{ m/s}}{0{,}06\text{ m}} = 5\text{ GHz}
+$$
 
 c) 
 La onda se puede clasificar dentro del grupo de lo que se denomina **Microondas** y corresponde a la banda **SHF** (*Super Alta Frecuencia*) la cual está definida por ITU como la banda 10. Este grupo abarca frecuencias en el rango de **3 a 30 GHZ**.
