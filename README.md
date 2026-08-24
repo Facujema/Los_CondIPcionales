@@ -50,5 +50,7 @@ No. Ya que este modelo representa una transmisión **Simplex** y para ser bidire
 c)
 La cuarta letra, o caracter, de nuestro grupo es "_". En código ASCII corresponde a 0x5F, su equivalente en binario 0b01011111
 
+![Transmisión de " _ " en ASCII](./Lab1/Punto2c.png)
+
 d) 
 La señal debería ser medida en el flanco descendente del clock, ya que para ese momento, el voltaje habría pasado el estado de transición, tomando un valor estable.
