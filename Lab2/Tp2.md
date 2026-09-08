@@ -83,9 +83,9 @@ El fenómeno representado es la **interferencia electromagnética (EMI)** o **ru
   $[ \text{SNR} = 10 \log_{10}\left(\frac{P_{señal}}{P_{ruido}}\right) \ \ [dB]]$
 
 
+La BER y la SNR están relacionadas de manera inversa: en una transmisión, si la SNR es alta, la señal es mucho más fuerte que el ruido, por lo que la BER tenderá a disminuir (a acercarse a cero), ya que el ruido es el factor que introduce errores en la recepción de los bits.
 
 
-**3) Resumir brevemente y para ir pensando: ¿Cómo ayudan los sistemas de transmisión digital a detectar y corregir errores producidos por ruido en el canal? ¿Y a compensar cambios en la frecuencia?**
 
 ## a) Detección y corrección de errores
 
