@@ -50,6 +50,20 @@ El estándar 802.1Q inserta un tag de 4 bytes en la trama Ethernet; la VLAN nati
   <img src="img/2_1.png" alt="Configuración inicial">
 </p>
 
+## 2. c) y d) Configuración de VLAN.
+
+<p align="center">
+  <img src="img/2_2.png" alt="Config Vlan">
+</p>
+
+## 2. g) Test de la comunicación entre las PC
+
+<p align="center">
+  <img src="img/2_4.png" alt="Config Vlan">
+</p>
+
+
+
 
 
 
