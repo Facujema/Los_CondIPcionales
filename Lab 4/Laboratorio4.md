@@ -38,5 +38,20 @@ Un enlace trunk es un enlace entre dispositivos de red que permite transportar t
 Es el proceso mediante el cual se agrega, a una trama Ethernet, información que permite identificar la VLAN a la que pertenece. El switch receptor utiliza ese identificador para saber que la trama pertenece a VLAN 10.
 El estándar 802.1Q inserta un tag de 4 bytes en la trama Ethernet; la VLAN nativa es una excepción habitual, ya que su tráfico puede circular sin tag por el trunk.
 
+## 2. a) Packet Tracer.
+
+<p align="center">
+  <img src="img/2_0.png" alt="diagrama logico">
+</p>
+
+## 2. b) Configuración Inicial.
+
+<p align="center">
+  <img src="img/2_1.png" alt="Configuración inicial">
+</p>
+
+
+
+
    
 
