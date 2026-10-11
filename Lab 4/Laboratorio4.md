@@ -137,14 +137,70 @@ En el router AIRCRAFT-R1 se aplicó enrutamiento Inter-VLAN Router-on-a-Stick cr
 <p align="center">
 <img src="img/3_08.png" alt="">
 </p>
+<p align="center">
+<img src="img/3_23.png" alt="">
+</p>
+
+## ¿Qué es la encapsulación dot1Q
+La encapsulación dot1Q hace referencia al estándar IEEE 802.1Q, un protocolo de Capa 2 (enlace de datos) utilizado para identificar y multiplexar el tráfico de múltiples VLANs a través de un único enlace troncal.
+Cuando una trama Ethernet viaja por un enlace troncal, el protocolo 802.1Q le inserta una etiqueta (tag) de 4 bytes en la cabecera. Esta etiqueta contiene el VLAN ID (número identificador de la VLAN), lo que permite que los switches y routers sepan a qué red virtual pertenece cada paquete.
+
+## Enrutamiento Inter-Vlan
+
+- Un único cable físico (Troncal): Se conecta un solo cable entre un puerto del switch (configurado como enlace troncal o trunk) y una interfaz física del router (por ejemplo, FastEthernet0/0).
+- Creación de Subinterfaces lógicas: La interfaz física del router se divide virtualmente en varias subinterfaces (por ejemplo, F0/0.10 para la VLAN 10 y F0/0.20 para la VLAN 20).
+- Asignación de VLAN e IP (Gateway): A cada subinterface se le asigna el etiquetado del protocolo IEEE 802.1Q con su número de VLAN correspondiente y una dirección IP, la cual funciona como la puerta de enlace (default gateway) de esa VLAN.
+- Flujo del tráfico: Cuando una PC de la VLAN 10 quiere enviar datos a una PC de la VLAN 20:
+
+  El tráfico sale del switch hacia el router etiquetado con la VLAN 10 por el enlace troncal.
+  
+  El router recibe el paquete en la subinterface de la VLAN 10, lo enruta en Capa 3 hacia la subinterface de la VLAN 20, le cambia la etiqueta y lo devuelve al switch por el mismo cable físico.
 
 ## Configuración del Servidor de Entretenimiento e ISP
 
 El servidor local se configuró con la IP estática 10.10.99.10 y el servicio HTTP activo con el portal AirConnect. En el ISP, la interfaz F0/0 se configuró con la IP 200.0.0.2/30 y la interfaz F0/1 con la IP 8.8.8.1/24 hacia un servidor público con IP 8.8.8.8 que simula la red pública de Internet.
 
+<p align="center">
+<img src="img/3_10.png" alt="Configuracion sv local 1">
+</p>
+<p align="center">
+<img src="img/3_11.png" alt="Configuracion sv local 2">
+</p>
+<p align="center">
+<img src="img/3_12.png" alt="Configuracion ISP">
+</p>
+
+
 ## Validaciones de Conectividad
 
-Desde la PC Turista, el ping a 10.10.99.10 y el acceso web al servidor local funcionaron correctamente, mientras que el ping a 8.8.8.8 fue bloqueado por la ACL 100 (Destination host unreachable). Desde la PC Business, el acceso web local funcionó y el ping a 8.8.8.8 respondió con 100% de éxito mediante NAT. Desde la PC Admin se obtuvo conectividad total por ping hacia todas las subredes e Internet.
+Desde la PC Turista, el ping a 10.10.99.10 y el acceso web al servidor local funcionaron correctamente, mientras que el ping a 8.8.8.8 fue bloqueado por la ACL 100 (Destination host unreachable). Desde la PC Business, el acceso web local funcionó y el ping a 8.8.8.8 respondió con 100% de éxito. Desde la PC Admin se obtuvo conectividad total por ping hacia todas las subredes e Internet.
+
+ipconfig de una de las Pc Turista.
+<p align="center">
+<img src="img/3_14.png" alt="">
+</p>
+Prueba del servidor local desde Pc Turista.
+<p align="center">
+<img src="img/3_13.png" alt="">
+</p>
+Ping a Internet desde Pc Turista
+<p align="center">
+<img src="img/3_15.png" alt="">
+</p>
+
+Prueba del servidor local desde Pc Business
+<p align="center">
+<img src="img/3_16.png" alt="">
+</p>
+<p align="center">
+<img src="img/3_17.png" alt="">
+</p>
+Ping a Internet desde Pc Business
+<p align="center">
+<img src="img/3_22.png" alt="">
+</p>
+
+
 
 
 
