@@ -93,6 +93,64 @@ La conexión en las PC falló. A pesar de que tanto PC-A como PC-B pertenecen al
 
 La conexión entre sw1 y sw2 también falló. En los incisos anteriores se migró la Interfaz Virtual del Switch (SVI de gestión) desde la VLAN 1 hacia la VLAN 99 (Management), asignando las direcciones IP 192.168.1.11 a sw1 y 192.168.1.12 a sw2. Al intentar hacer un ping entre los switches, este vuelve a fallar por la misma razón: el puerto de interconexión F0/1 no transporta el tráfico de la VLAN 99 porque sigue operando como puerto de acceso en la VLAN 1. Por lo tanto, los dominios de difusión de gestión en ambos switches se encuentran aislados entre sí.
 
+## 3 Topología y consideraciones de cableado
+
+<p align="center">
+<img src="img/3_00.png" alt="Topologia punto 3">
+</p>
+
+El diseño contempla la coexistencia de tres servicios definidos: la clase Turista, la clase Business y el área de Administración. Cada una de estas partes exige niveles diferenciados de acceso a los recursos locales y a Internet. Para llevar a cabo esta solución, se ha optado por una topología física centralizada en un switch principal denominado SW-Avion, conectado a un router central denominado AIRCRAFT-R1, el cual gestiona el tráfico interno y se conecta externamente al router del proveedor de servicios de Internet (ISP).
+Durante el proceso de interconexión física se prestó especial atención a los tipos de medios empleados. Debido a que las conexiones entre el router AIRCRAFT-R1 y el router ISP, así como entre el ISP y el servidor de Internet, se realizan de manera directa entre dispositivos que pertenecen a la misma categoría física (interfaces MDI), fue imprescindible utilizar cableado cruzado (Copper Cross-Over). Por otro lado, la vinculación entre los equipos clientes, el servidor local de entretenimiento y el switch se realizó mediante cableado directo estandarizado.
+
+##  Esquema de Direccionamiento IP
+
+La VLAN 10 (Turista) utiliza la subred 10.10.10.0/24 con gateway 10.10.10.1. La VLAN 20 (Business) utiliza la subred 10.10.20.0/24 con gateway 10.10.20.1. La VLAN 99 (Admin) utiliza la subred 10.10.99.0/24 con gateway 10.10.99.1 y aloja al servidor local en la IP fija 10.10.99.10. El enlace WAN punto a punto entre AIRCRAFT-R1 e ISP se configuró en la red 200.0.0.0/30, asignando las direcciones 200.0.0.1 al router de la aeronave y 200.0.0.2 al proveedor.
+
+## Configuración del Switch Principal
+
+En el switch SW-Avion se crearon las VLANs 10, 20 y 99. El puerto F0/1 se configuró como enlace **Trunk** hacia el router. Los puertos F0/2 y F0/3 se asignaron a la VLAN 10, los puertos F0/4 y F0/5 a la VLAN 20, el puerto F0/6 a la VLAN 99 para la PC de administración y el puerto F0/7 a la VLAN 99 para el servidor de entretenimiento.
+
+<p align="center">
+<img src="img/3_01.png" alt="Configuracion VLAN switch principal">
+</p>
+
+<p align="center">
+<img src="img/3_02.png" alt="Configuracion VLAN switch principal">
+</p>
+
+
+## ¿Qué es un enlace Trunk?
+Un enlace troncal (trunk link) es un puerto o enlace físico de red configurado para transportar el tráfico de múltiples VLANs simultáneamente a través de un único cable.   A diferencia de un puerto de acceso (access port), que solo puede pertenecer a una única VLAN a la cual entrega tráfico no etiquetado, el enlace troncal utiliza un protocolo de etiquetado (como el estándar IEEE 802.1Q). Este protocolo inserta un encabezado especial en la trama Ethernet que contiene el identificador de la VLAN (VLAN ID), lo que permite al dispositivo receptor saber exactamente a qué red virtual pertenece cada paquete.
+
+## Configuración de Enrutamiento, DHCP, NAT y Seguridad
+
+En el router AIRCRAFT-R1 se aplicó enrutamiento Inter-VLAN Router-on-a-Stick creando las subinterfaces F0/0.10, F0/0.20 y F0/0.99 con encapsulación dot1Q e IPs de gateway. Se configuraron servidores DHCP para cada segmento excluyendo las primeras 10 direcciones. Se habilitó NAT con sobrecarga (PAT) en la interfaz FastEthernet0/1 mediante la lista de acceso 20, permitiendo salida a Internet únicamente a Business y Admin. Para Turista se aplicó la ACL extendida 100 en la subinterfaz F0/0.10, autorizando solo el tráfico hacia la subred del servidor local (10.10.99.0/24) y denegando la salida exterior.
+
+<p align="center">
+<img src="img/3_04.png" alt="">
+</p>
+<p align="center">
+<img src="img/3_05.png" alt="">
+</p><p align="center">
+<img src="img/3_06.png" alt="">
+</p>
+<p align="center">
+<img src="img/3_08.png" alt="">
+</p>
+
+## Configuración del Servidor de Entretenimiento e ISP
+
+El servidor local se configuró con la IP estática 10.10.99.10 y el servicio HTTP activo con el portal AirConnect. En el ISP, la interfaz F0/0 se configuró con la IP 200.0.0.2/30 y la interfaz F0/1 con la IP 8.8.8.1/24 hacia un servidor público con IP 8.8.8.8 que simula la red pública de Internet.
+
+## Validaciones de Conectividad
+
+Desde la PC Turista, el ping a 10.10.99.10 y el acceso web al servidor local funcionaron correctamente, mientras que el ping a 8.8.8.8 fue bloqueado por la ACL 100 (Destination host unreachable). Desde la PC Business, el acceso web local funcionó y el ping a 8.8.8.8 respondió con 100% de éxito mediante NAT. Desde la PC Admin se obtuvo conectividad total por ping hacia todas las subredes e Internet.
+
+
+
+
+
+
 
    
 
