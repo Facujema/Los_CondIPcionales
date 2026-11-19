@@ -14,7 +14,7 @@ Los mensajes ICMP viajan encapsulados dentro de paquetes IP, es decir, forman pa
 La encapsulación es la siguiente:
 
 <p align="center">
-  <img src="img/2_0.png" alt="">
+  <img src="img/015.png" alt="">
 </p>
 
 ## 1. c) ¿Qué hace ping? ¿Qué son un Echo Request y un Echo Reply? ¿Qué campos de ICMP permiten distinguirlos?
@@ -24,7 +24,7 @@ Para hacerlo, utiliza dos tipos de mensajes ICMP:
       -Echo Reply (tipo 0): mensaje enviado por el dispositivo de destino en respuesta al Echo Request.
 
 <p align="center">
-  <img src="img/2_0.png" alt="">
+  <img src="img/016.png" alt="">
 </p>
 
 Los campos principales de ICMP que permiten distinguir ambos mensajes son:
@@ -57,13 +57,17 @@ Conclusión: ICMP es un protocolo de control y diagnóstico que funciona encapsu
 
 
 <p align="center">
-  <img src="img/2_0.png" alt="">
+  <img src="img/001.png" alt="">
 </p>
 
 ## ipconfig
 
 <p align="center">
-  <img src="img/2_0.png" alt="">
+  <img src="img/003.png" alt="">
+</p>
+
+<p align="center">
+  <img src="img/004.png" alt="">
 </p>
 
 ## Echo request y Wireshark
@@ -148,7 +152,7 @@ Este procedimiento permite transformar una dirección IPv4 conocida en la direcc
 ## 2. e) Ver la caché ARP de su computadora y buscar la entrada del gateway:
 
 <p align="center">
-  <img src="img/2_0.png" alt="">
+  <img src="img/006.png" alt="">
 </p>
 
 Sí, la dirección MAC asociada al gateway coincide con la dirección MAC destino observada anteriormente en Wireshark.
@@ -158,7 +162,7 @@ Sí, la dirección MAC asociada al gateway coincide con la dirección MAC destin
 Utilizando el método A con una ip sin uso:
 
 <p align="center">
-  <img src="img/2_0.png" alt="">
+  <img src="img/007.png" alt="">
 </p>
 
 Del paquete 992 podemos completar toda la columna correspondiente al ARP Request.
@@ -176,7 +180,7 @@ Del paquete 992 podemos completar toda la columna correspondiente al ARP Request
 Haciendo ping a la dirección IP de mi celular:
 
 <p align="center">
-  <img src="img/2_0.png" alt="">
+  <img src="img/009.png" alt="">
 </p>
 
 
@@ -216,7 +220,7 @@ Por este motivo, la computadora no pudo resolver la dirección MAC del destino y
 ## Volvieron a hacer ping al mismo destino un minuto después: ¿apareció ARP de nuevo? Revisen la caché ARP. ¿Qué ventaja tiene la caché y qué problema podría causar si una entrada quedara vieja?
 
 <p align="center">
-  <img src="img/2_0.png" alt="">
+  <img src="img/010.png" alt="">
 </p>
 
 Al repetir el ping hacia la dirección 192.168.0.253, se observó que la computadora volvió a generar solicitudes ARP. En la nueva captura de Wireshark se identificaron tres ARP Request, correspondientes a los paquetes 153, 161 y 170, sin recibir una respuesta ARP del destino.
@@ -226,6 +230,14 @@ La caché ARP permite almacenar temporalmente las asociaciones entre direcciones
 Al consultar la caché ARP, se comprobó que la dirección 192.168.0.253 no tenía una asociación MAC válida almacenada, lo que explica la necesidad de repetir las solicitudes ARP.
 
 ## 3. a) ¿Qué significa "establecer una conexión"? ¿Dónde "existe" una conexión TCP: en los cables, en los routers o en los extremos? 
+
+<p align="center">
+  <img src="img/012.png" alt="">
+</p>
+
+<p align="center">
+  <img src="img/013.png" alt="">
+</p>
 
 Establecer una conexión TCP significa iniciar una comunicación lógica entre dos dispositivos, acordando los parámetros necesarios para intercambiar datos de manera confiable y ordenada.
 Este proceso se realiza mediante el mecanismo conocido como three-way handshake, que consiste en el intercambio de tres segmentos:
@@ -331,6 +343,10 @@ Si consideramos una conexión nueva para enviar una sola frase, TCP podría nece
 Los paquetes adicionales de TCP permiten proporcionar mecanismos de entrega confiable, ordenamiento, detección de pérdidas, retransmisión y control de flujo y congestión, funcionalidades que UDP no ofrece directamente.
 
 ## 4. Servidor TCP mínimo - TP5 Redes de Computadoras. 
+
+<p align="center">
+  <img src="img/014.png" alt="">
+</p>
 
 - socket(), bind() y listen(): son operaciones locales del sistema operativo y no producen tráfico de red.
 - connect(): inicia el establecimiento de la conexión TCP mediante el three-way handshake.
