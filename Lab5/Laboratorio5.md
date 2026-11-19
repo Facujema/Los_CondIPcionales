@@ -330,4 +330,32 @@ Estos valores corresponden a los intercambios completos observados, no al envío
 Si consideramos una conexión nueva para enviar una sola frase, TCP podría necesitar, en un caso sencillo, 3 segmentos para establecer la conexión, 1 para transmitir los datos, 1 ACK de confirmación y 4 para cerrar la conexión: 9 segmentos en total. UDP podría enviar esa misma frase en un único datagrama. La cantidad real de segmentos TCP puede variar.
 Los paquetes adicionales de TCP permiten proporcionar mecanismos de entrega confiable, ordenamiento, detección de pérdidas, retransmisión y control de flujo y congestión, funcionalidades que UDP no ofrece directamente.
 
-## 4. a) 
+## 4. Servidor TCP mínimo - TP5 Redes de Computadoras. 
+
+- socket(), bind() y listen(): son operaciones locales del sistema operativo y no producen tráfico de red.
+- connect(): inicia el establecimiento de la conexión TCP mediante el three-way handshake.
+- accept(): espera una conexión entrante y devuelve un socket conectado. No genera tráfico por sí misma.
+- sendall(): envía los datos de la aplicación. En nuestra captura, el cliente envió 22 bytes y el servidor respondió con 32 bytes.
+- recv(): obtiene datos recibidos por el socket. Los ACK observados son generados por el protocolo TCP, no directamente por esta función.
+- close(): inicia el cierre del socket. En nuestra captura se observan los intercambios FIN-ACK y ACK de ambos extremos.
+
+
+| Llamada | ¿Dónde se ejecuta? | ¿Genera tráfico? | Segmentos que observan |
+| --- | --- | --- | --- |
+| `socket()` | Servidor y cliente | No | Ninguno. |
+| `bind()` | Servidor | No | Ninguno. |
+| `listen()` | Servidor | No | Ninguno. |
+| `connect()` | Cliente | Sí | 4465 `[SYN]`, 4466 `[SYN, ACK]`, 4467 `[ACK]`. |
+| `accept()` | Servidor | No directamente | Retorna después del establecimiento de la conexión (4465–4467). |
+| `sendall()` | Servidor y cliente | Sí | 4468 `[PSH, ACK]` (cliente) y 4470 `[PSH, ACK]` (servidor). |
+| `recv()` | Servidor y cliente | No directamente | 4469 `[ACK]` (servidor) y 4471 `[ACK]` (cliente), generados automáticamente por TCP. |
+| `close()` | Ambos | Sí | 4472 `[FIN, ACK]`, 4473 `[ACK]`, 4474 `[FIN, ACK]`, 4475 `[ACK]`. |
+
+
+## Conclusión
+
+A lo largo de este trabajo práctico se logró comprender y analizar el funcionamiento de distintos protocolos de comunicación de redes, relacionando los conceptos teóricos con su comportamiento real mediante el uso de Wireshark, Ncat y Python.
+En primer lugar, mediante el protocolo ICMP, se estudió el funcionamiento de la herramienta ping, identificando los mensajes Echo Request y Echo Reply, sus encabezados, direcciones de origen y destino, valores de TTL y el proceso de encapsulación de los datos. Posteriormente, con ARP, se observó cómo los dispositivos de una red local obtienen las direcciones MAC asociadas a determinadas direcciones IP, analizando el intercambio de solicitudes y respuestas, así como la utilidad de la caché ARP.
+Luego, mediante Ncat, se experimentó con los protocolos de transporte TCP y UDP, identificando sus principales diferencias. Se comprobó que TCP establece una conexión mediante el three-way handshake, utiliza mecanismos de confirmación de recepción y permite un cierre ordenado, mientras que UDP transmite datagramas sin necesidad de establecer una conexión previa ni confirmar su recepción.
+Finalmente, se implementó una comunicación cliente-servidor mediante sockets TCP en Python, lo que permitió relacionar las funciones utilizadas en el código con los segmentos capturados en Wireshark, comprendiendo cómo las aplicaciones interactúan con los protocolos de red.
+En conclusión, el laboratorio permitió integrar los conocimientos sobre direccionamiento, encapsulación, resolución de direcciones y protocolos de transporte, observando cómo interactúan las distintas capas de comunicación. Además, se adquirió experiencia práctica en el análisis de tráfico de red y en la implementación de comunicaciones mediante sockets, reforzando la comprensión del funcionamiento de las redes de computadoras.
