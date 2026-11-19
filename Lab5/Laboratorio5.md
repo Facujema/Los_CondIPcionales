@@ -155,6 +155,13 @@ Sí, la dirección MAC asociada al gateway coincide con la dirección MAC destin
 
 ## 2. f) Generar tráfico ARP y capturarlo
 
+Utilizando el método A con una ip sin uso:
+
+<p align="center">
+  <img src="img/2_0.png" alt="">
+</p>
+
+Del paquete 992 podemos completar toda la columna correspondiente al ARP Request.
 
 | Campo | ARP Request (paquete 992) | ARP Reply |
 | --- | --- | --- |
@@ -165,3 +172,56 @@ Sí, la dirección MAC asociada al gateway coincide con la dirección MAC destin
 | Sender IP address | `192.168.0.118` | Pendiente |
 | Target MAC address | `00:00:00:00:00:00` | Pendiente |
 | Target IP address | `192.168.0.253` | Pendiente |
+
+Haciendo ping a la dirección IP de mi celular:
+
+<p align="center">
+  <img src="img/2_0.png" alt="">
+</p>
+
+
+| Campo | ARP Request (299) | ARP Reply (300) |
+| --- | --- | --- |
+| MAC destino (encabezado Ethernet) | `FF:FF:FF:FF:FF:FF` | `4A:FF:44:EC:1D:41` |
+| MAC origen (encabezado Ethernet) | `4A:FF:44:EC:1D:41` | `1C:1B:0D:E9:4E:96` |
+| Opcode | `1` (Request) | `2` (Reply) |
+| Sender MAC address | `4A:FF:44:EC:1D:41` | `1C:1B:0D:E9:4E:96` |
+| Sender IP address | `192.168.0.39` | `192.168.0.118` |
+| Target MAC address | `00:00:00:00:00:00` | `4A:FF:44:EC:1D:41` |
+| Target IP address | `192.168.0.118` | `192.168.0.39` |
+
+En este caso, el celular (192.168.0.39) consultó la dirección MAC de la computadora (192.168.0.118), y la computadora respondió. Aunque se generó el tráfico haciendo ping al celular, los dos paquetes seleccionados corresponden a una consulta ARP iniciada por el celular.
+
+## ¿Por qué el Request va a una dirección broadcast y el Reply no? ¿Qué valor tiene Target MAC address en el Request y por qué?
+
+El ARP Request se envía a una dirección broadcast (FF:FF:FF:FF:FF:FF) porque el dispositivo emisor desconoce la dirección MAC asociada a la dirección IP que desea consultar. De esta manera, todos los dispositivos del segmento de red local reciben la solicitud y aquel que posee la IP buscada puede responder.
+En cambio, el ARP Reply se envía mediante unicast, directamente al dispositivo que realizó la solicitud, ya que su dirección MAC se encuentra incluida en el ARP Request.
+En nuestra captura, el paquete 299 corresponde al ARP Request enviado por el celular (192.168.0.39) y el paquete 300 al ARP Reply enviado por nuestra computadora (192.168.0.118).
+El campo Target MAC address del ARP Request tiene el valor 00:00:00:00:00:00, porque representa precisamente la dirección MAC que se intenta descubrir.
+
+## En el encabezado Ethernet de la trama ARP, ¿qué valor tiene el campo Type? ¿Hay un encabezado IP? ¿Qué les dice eso sobre dónde "vive" ARP? 
+
+En el encabezado Ethernet de los paquetes ARP, el campo Type (EtherType) tiene el valor 0x0806, que identifica al protocolo ARP.
+En la captura de Wireshark se observa que, después del encabezado Ethernet II, aparece directamente el encabezado Address Resolution Protocol, sin un encabezado IP intermedio.
+Esto demuestra que ARP se transporta directamente sobre Ethernet y funciona en la capa de enlace de datos (capa 2 del modelo OSI).
+Sin embargo, su clasificación es discutible porque permite relacionar las direcciones IPv4 de la capa de red con las direcciones MAC de la capa de enlace, actuando como un mecanismo de comunicación entre ambas capas.
+
+## Con la Opción A (IP inexistente): ¿cuántos ARP Request aparecieron? ¿Hubo Reply? ¿Apareció algún ICMP Echo Request en la captura? Expliquen por qué. 
+
+Al realizar un ping hacia la dirección 192.168.0.253, perteneciente a nuestra subred local pero aparentemente sin ningún dispositivo asociado, se observaron varias solicitudes ARP Request.
+En la captura proporcionada se identifican al menos tres solicitudes dirigidas a esa dirección IP, correspondientes a los paquetes 966, 982 y 992, además de otras solicitudes posteriores.
+No se observó ningún ARP Reply asociado a esa dirección en los paquetes mostrados, ya que aparentemente ningún dispositivo de la red posee dicha IP.
+Por este motivo, la computadora no pudo resolver la dirección MAC del destino y, en consecuencia, no pudo construir la trama Ethernet necesaria para enviar el ICMP Echo Request.
+
+## Volvieron a hacer ping al mismo destino un minuto después: ¿apareció ARP de nuevo? Revisen la caché ARP. ¿Qué ventaja tiene la caché y qué problema podría causar si una entrada quedara vieja?
+
+<p align="center">
+  <img src="img/2_0.png" alt="">
+</p>
+
+Al repetir el ping hacia la dirección 192.168.0.253, se observó que la computadora volvió a generar solicitudes ARP. En la nueva captura de Wireshark se identificaron tres ARP Request, correspondientes a los paquetes 153, 161 y 170, sin recibir una respuesta ARP del destino.
+Esto ocurre porque la dirección IP consultada aparentemente no corresponde a ningún dispositivo activo de la red local. Como no se obtuvo una dirección MAC válida, el sistema operativo debe intentar resolverla nuevamente cuando necesita comunicarse con ese destino.
+La caché ARP permite almacenar temporalmente las asociaciones entre direcciones IP y MAC, evitando realizar nuevas solicitudes ARP cada vez que se establece comunicación con un dispositivo conocido. Esto reduce el tráfico broadcast y mejora la eficiencia de la red.
+
+Al consultar la caché ARP, se comprobó que la dirección 192.168.0.253 no tenía una asociación MAC válida almacenada, lo que explica la necesidad de repetir las solicitudes ARP.
+
