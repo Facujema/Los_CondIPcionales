@@ -225,3 +225,109 @@ La caché ARP permite almacenar temporalmente las asociaciones entre direcciones
 
 Al consultar la caché ARP, se comprobó que la dirección 192.168.0.253 no tenía una asociación MAC válida almacenada, lo que explica la necesidad de repetir las solicitudes ARP.
 
+## 3. a) ¿Qué significa "establecer una conexión"? ¿Dónde "existe" una conexión TCP: en los cables, en los routers o en los extremos? 
+
+Establecer una conexión TCP significa iniciar una comunicación lógica entre dos dispositivos, acordando los parámetros necesarios para intercambiar datos de manera confiable y ordenada.
+Este proceso se realiza mediante el mecanismo conocido como three-way handshake, que consiste en el intercambio de tres segmentos:
+La conexión TCP existe lógicamente en los extremos de la comunicación, es decir, en los sistemas operativos del cliente y del servidor, que mantienen información sobre su estado.
+Los cables solamente transmiten señales y los routers encaminan paquetes IP, pero normalmente no mantienen el estado de cada conexión TCP.
+
+## 3. b)  ¿Qué es un puerto? ¿Qué identifica el par (IP, puerto)? 
+Un puerto es un identificador numérico de 16 bits utilizado por protocolos de transporte como TCP y UDP para distinguir servicios y aplicaciones que se comunican a través de la red.
+El par (dirección IP, puerto) identifica un extremo de comunicación dentro de un protocolo de transporte.
+- La dirección IP identifica la interfaz o dirección de red del dispositivo.
+- El puerto identifica el punto de comunicación asociado a un proceso o servicio.
+Por ejemplo, en nuestro laboratorio utilizaremos:
+
+  Dirección IP: 127.0.0.1
+  Puerto TCP:   12000
+
+Este par identifica el extremo donde estará escuchando nuestro servidor TCP.
+Una conexión TCP completa se distingue mediante las IP y puertos de ambos extremos, junto con el protocolo TCP.
+
+## 3. c) ¿Qué significa que un proceso esté "escuchando" en un puerto? 
+Que un proceso esté escuchando en un puerto significa que ha creado un socket, lo ha asociado a una dirección IP y un puerto, y se encuentra preparado para aceptar solicitudes de conexión entrantes.
+En TCP, el sistema operativo mantiene ese socket en estado LISTEN y puede responder a las solicitudes de conexión de los clientes.
+En nuestro experimento, ejecutaremos:
+
+ncat -v -l 12000
+
+Este comando inicia un servidor que escucha conexiones TCP en el puerto 12000.
+Cuando un cliente intenta conectarse a ese puerto, el servidor puede aceptar la conexión y comenzar a intercambiar datos.
+
+## ¿Qué pasó en la red cuando ejecutaron el comando del cliente, antes de escribir el primer mensaje? Compárenlo con TCP.
+Al ejecutar el cliente UDP, antes de escribir el primer mensaje, no se observó ningún intercambio de paquetes destinado a establecer una conexión. Esto se debe a que UDP es un protocolo no orientado a conexión y no necesita realizar un procedimiento de establecimiento previo a la transmisión de datos.
+En cambio, al ejecutar el cliente TCP, Wireshark registró tres segmentos correspondientes al three-way handshake: SYN (paquete 21), SYN-ACK (paquete 22) y ACK (paquete 23).
+Por lo tanto, TCP establece una conexión antes de intercambiar datos, mientras que UDP puede comenzar a transmitir datagramas directamente.
+
+## ¿Cuántos datagramas generó cada mensaje? ¿Hay algo parecido a un ACK?
+En nuestro experimento UDP se observaron cuatro datagramas, correspondientes a los cuatro mensajes intercambiados entre el cliente y el servidor.
+
+| Paquete | Longitud capturada | Contenido |
+| :--- | ---: | :--- |
+| 32 | 47 bytes | Hola servidor |
+| 38 | 46 bytes | Mensaje de respuesta |
+| 41 | 53 bytes | Mensaje adicional |
+| 44 | 44 bytes | Mensaje adicional |
+
+A diferencia de TCP, UDP no utiliza confirmaciones ACK para garantizar que los datos fueron recibidos. Por este motivo, no se observaron paquetes adicionales de reconocimiento por cada mensaje enviado.
+Esto implica que UDP no garantiza por sí mismo la entrega, el orden ni la retransmisión de los datos perdidos.
+
+## Comparen el encabezado UDP con el encabezado TCP de un segmento con datos: ¿qué campos tiene cada uno? ¿Cuántos bytes ocupa cada encabezado?
+
+El encabezado UDP es más simple que el de TCP, ya que contiene únicamente cuatro campos y tiene un tamaño fijo de 8 bytes.
+En cambio, TCP incorpora información adicional que permite controlar las conexiones, ordenar los datos, confirmar su recepción y regular la transmisión.
+
+
+| Campo | TCP | UDP |
+| --- | --- | --- |
+| Puerto origen | Sí | Sí |
+| Puerto destino | Sí | Sí |
+| Número de secuencia | Sí | No |
+| Número de reconocimiento | Sí | No |
+| Longitud del encabezado | Sí | No |
+| Flags de control | Sí | No |
+| Tamaño de ventana | Sí | No |
+| Checksum | Sí | Sí |
+| Puntero urgente | Sí | No |
+| Longitud del datagrama | No como campo específico | Sí |
+| Opciones | Opcional | No |
+
+En cuanto a sus tamaños:
+- UDP: encabezado fijo de 8 bytes.
+- TCP: encabezado mínimo de 20 bytes, que puede aumentar hasta 60 bytes cuando se incluyen opciones.
+En nuestras capturas, los segmentos TCP que transportaban mensajes tenían encabezados de 20 bytes, mientras que los datagramas UDP tenían encabezados de 8 bytes.
+Esta diferencia refleja que TCP proporciona mecanismos de control adicionales que UDP no implementa.
+
+## ¿Qué pasó en la red al cerrar el cliente con Ctrl+C? ¿Y en TCP?
+Al cerrar el cliente UDP mediante Ctrl+C, no se observó un intercambio específico de paquetes destinado a finalizar la comunicación, ya que UDP no mantiene una conexión establecida entre los extremos.
+En cambio, al cerrar la comunicación TCP, Wireshark registró un intercambio de segmentos FIN y ACK para finalizar la conexión de forma ordenada.
+En nuestra captura TCP se identificaron los siguientes paquetes:
+
+
+| Paquete | Flags | Función |
+| --- | --- | --- |
+| 312 | FIN, ACK | El servidor inicia el cierre. |
+| 313 | ACK | El cliente confirma el cierre del servidor. |
+| 315 | FIN, ACK | El cliente cierra su extremo. |
+| 316 | ACK | El servidor confirma el cierre del cliente. |
+
+## Para enviar la misma frase, ¿cuántos paquetes necesitaron en total con TCP y cuántos con UDP? ¿Qué «compran» con los paquetes extra de TCP?
+
+En las capturas realizadas con Wireshark se observaron diferencias en la cantidad de paquetes necesarios para transmitir datos.
+Para enviar una frase, UDP utilizó un único datagrama, mientras que TCP requirió establecer previamente una conexión y confirmar la recepción de los datos.
+En nuestro experimento, los paquetes capturados fueron:
+
+
+| Etapa | TCP | UDP |
+| :--- | ---: | ---: |
+| Establecimiento de conexión | 3 | 0 |
+| Transferencia de datos | 12 | 4 |
+| Cierre de conexión | 4 | 0 |
+| **Total del experimento** | **19** | **4** |
+
+Estos valores corresponden a los intercambios completos observados, no al envío de una única frase. En TCP se enviaron seis mensajes de aplicación y en UDP cuatro.
+Si consideramos una conexión nueva para enviar una sola frase, TCP podría necesitar, en un caso sencillo, 3 segmentos para establecer la conexión, 1 para transmitir los datos, 1 ACK de confirmación y 4 para cerrar la conexión: 9 segmentos en total. UDP podría enviar esa misma frase en un único datagrama. La cantidad real de segmentos TCP puede variar.
+Los paquetes adicionales de TCP permiten proporcionar mecanismos de entrega confiable, ordenamiento, detección de pérdidas, retransmisión y control de flujo y congestión, funcionalidades que UDP no ofrece directamente.
+
+## 4. a) 
